@@ -1,7 +1,16 @@
-from flask.cli import FlaskGroup
-from src import app, db
 
-cli = FlaskGroup(app)
+import sys
+
+from flask.cli import FlaskGroup
+
+from src import create_app, db   # new
+from src.api.models import User  # new
+
+
+app = create_app()  # new
+# thanks to create_app=create_app @app.shell_context_processor ->  def ctx() is accesible
+cli = FlaskGroup(create_app=create_app)  # new
+
 
 @cli.command('recreate_db')
 def recreate_db():
