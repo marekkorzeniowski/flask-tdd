@@ -17,3 +17,6 @@ docker-compose exec api python manage.py recreate_db
 
 # seed db
 docker-compose exec api python manage.py seed_db
+
+# Stop and remove containers
+docker-compose down -v
