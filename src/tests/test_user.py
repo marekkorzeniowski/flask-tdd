@@ -95,7 +95,7 @@ def test_remove_user(test_app, test_database, add_user):
     resp_two = client.delete(f"/users/{user.id}")
     data = json.loads(resp_two.data.decode())
     assert resp_two.status_code == 200
-    assert 'remove-me@testdriven.io was removed!' in data['message']
+    assert "remove-me@testdriven.io was removed!" in data["message"]
 
     resp_three = client.get("/users")
     data = json.loads(resp_three.data.decode())
@@ -165,13 +165,24 @@ def test_update_user(test_app, test_database, add_user):
 #     assert resp.status_code == 404
 #     assert "User 999 does not exist" in data["message"]
 
+
 # Instead of writing similiar test 3 times it's better to use @pytest.mark.parametrize
-@pytest.mark.parametrize("user_id, payload, status_code, message", [
-    [1, {}, 400, "Input payload validation failed"],
-    [1, {"email": "me@testdriven.io"}, 400, "Input payload validation failed"],
-    [999, {"username": "me", "email": "me@testdriven.io"}, 404, "User 999 does not exist"],
-])
-def test_update_user_invalid(test_app, test_database, user_id, payload, status_code, message):
+@pytest.mark.parametrize(
+    "user_id, payload, status_code, message",
+    [
+        [1, {}, 400, "Input payload validation failed"],
+        [1, {"email": "me@testdriven.io"}, 400, "Input payload validation failed"],
+        [
+            999,
+            {"username": "me", "email": "me@testdriven.io"},
+            404,
+            "User 999 does not exist",
+        ],
+    ],
+)
+def test_update_user_invalid(
+    test_app, test_database, user_id, payload, status_code, message
+):
     client = test_app.test_client()
     resp = client.put(
         f"/users/{user_id}",
