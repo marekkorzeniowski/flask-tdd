@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import request
 from flask_restx import Namespace, Resource, fields
 
 from src.api.users.crud import (  # isort:skip

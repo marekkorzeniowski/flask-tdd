@@ -1,4 +1,4 @@
-env
+../../env
 Dockerfile
 Dockerfile.prod
 docker_command.txt

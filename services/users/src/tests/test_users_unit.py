@@ -3,8 +3,6 @@ from datetime import datetime
 
 import pytest
 
-import src.api.users.views
-
 
 # POST - add
 def test_add_user(test_app, monkeypatch):
