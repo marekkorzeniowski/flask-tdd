@@ -27,3 +27,19 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
+  client:
+    stdin_open: true
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile
+    volumes:
+      - './services/client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3007:5173
+    environment:
+      - NODE_ENV=development
+      - VITE_API_SERVICE_URL=${VITE_API_SERVICE_URL}
+    depends_on:
+      - api
