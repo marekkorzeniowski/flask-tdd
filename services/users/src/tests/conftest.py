@@ -33,7 +33,7 @@ def test_database():
     db.drop_all()
 
 
-pytest.fixture(scope="function")
+@pytest.fixture(scope="function")
 def add_user():
     def _add_user(username, email, password):
         user = User(username=username, email=email, password=password)
