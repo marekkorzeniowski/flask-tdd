@@ -60,7 +60,7 @@ const NavBar: React.FC<NavBarProps> = ({ title }) => {
 const NavLinks = () => (
   <>
     <Link as={RouterLink} to="/status" mr={4} color="white">
-      User Status
+          User Status
     </Link>
     <Link as={RouterLink} to="/about" mr={4} color="white">
       About

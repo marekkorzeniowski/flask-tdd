@@ -1,5 +1,6 @@
-import React, { useState } from "react";
 import axios from "axios";
+import { Formik, Form, Field } from "formik";
+import { z } from "zod";
 import {
   Box,
   Button,
@@ -7,85 +8,71 @@ import {
   FormLabel,
   Input,
   Heading,
-  Text,
 } from "@chakra-ui/react";
-import { z } from "zod"; // new line
+import { FormErrorMessage } from "@chakra-ui/react";
 
 interface UserObject {
   username: string;
   email: string;
+  password?: string;
+  created_date?: string;
 }
 
 interface AddUserProps {
   addUserToList: (user: UserObject) => void;
 }
 
-// Zod schema for validation
-const userSchema = z.object({
-  username: z
-    .string()
-    .min(4, { message: "Username must be at least 4 characters long" })
-    .regex(/^[a-zA-Z0-9_]+$/, { message: "Username can only contain letters, numbers, and underscores" }),
-  email: z.string().email({ message: "Invalid email address" }),
+type FieldProps = {
+  field: {
+    name: string;
+    value: string;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
+  };
+};
+
+const validationSchema = z.object({
+  username: z.string()
+    .min(4, "Username must be at least 4 characters long")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+  email: z.string()
+    .email("Enter a valid email"),
+  password: z.string()
+    .min(6, "Password must be at least 6 characters long"),
 });
 
+type FormValues = z.infer<typeof validationSchema>;
+
 const AddUser: React.FC<AddUserProps> = ({ addUserToList }) => {
-  const [userData, setUserData] = useState<UserObject>({
-    username: "",
-    email: "",
-  });
-
-  const [errors, setErrors] = useState<{ username?: string; email?: string }>({});
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserData({
-      ...userData,
-      [name]: value,
-    });
-  };
-
-  // Handle form submit
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Validate the data using Zod
-    const result = userSchema.safeParse(userData);
-
-    if (!result.success) {
-      // Handle validation errors
-      const validationErrors = result.error.format();
-      setErrors({
-        username: validationErrors.username?._errors[0],
-        email: validationErrors.email?._errors[0],
-      });
-      return;
-    }
-
-    // Clear any previous errors
-    setErrors({});
-
+  const handleSubmit = async (
+    values: FormValues,
+    {
+      setSubmitting,
+      resetForm,
+    }: { setSubmitting: (isSubmitting: boolean) => void; resetForm: () => void }
+  ) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_SERVICE_URL}/users`,
-        userData
+        values
       );
 
       if (response.status === 201) {
         console.log(response.data.message);
 
         const newUser = {
-          username: userData.username,
-          email: userData.email,
+          username: values.username,
+          email: values.email,
           created_date: new Date().toISOString(),
         };
 
         addUserToList(newUser);
-
-        setUserData({ username: "", email: "" });
+        resetForm();
       }
     } catch (error) {
       console.error("There was an error registering the user:", error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -97,58 +84,110 @@ const AddUser: React.FC<AddUserProps> = ({ addUserToList }) => {
         </Heading>
       </Box>
 
-      <Box
-        as="form"
-        p={4}
-        borderWidth={1}
-        borderRadius="lg"
-        boxShadow="lg"
-        maxW="500px"
+      <Formik
+        initialValues={{ username: "", email: "", password: "" }}
+        validate={(values) => {
+          try {
+            validationSchema.parse(values);
+            return {};
+          } catch (error) {
+            return (error as z.ZodError).formErrors.fieldErrors;
+          }
+        }}
         onSubmit={handleSubmit}
-        textAlign="left"
       >
-        <FormControl isRequired mb={6} isInvalid={!!errors.username}>
-          <FormLabel fontSize="lg" htmlFor="input-username">
-            Username
-          </FormLabel>
-          <Input
-            name="username"
-            id="input-username"
-            size="lg"
-            placeholder="Enter a username"
-            type="text"
-            value={userData.username}
-            onChange={handleInputChange}
-          />
-          {errors.username && <Text color="red.500">{errors.username}</Text>}
-        </FormControl>
+        {({ errors, touched, isSubmitting }) => (
+          <Form>
+            <Box
+              p={4}
+              borderWidth={1}
+              borderRadius="lg"
+              boxShadow="lg"
+              maxW="500px"
+              textAlign="left"
+            >
+              <Field name="username">
+                {({ field }: FieldProps) => (
+                  <FormControl
+                    isRequired
+                    mb={6}
+                    isInvalid={!!(errors.username && touched.username)}
+                  >
+                    <FormLabel fontSize="lg" htmlFor="input-username">
+                      Username
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      id="input-username"
+                      placeholder="Enter a username"
+                    />
+                    {errors.username && touched.username && (
+                      <FormErrorMessage>{errors.username}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                )}
+              </Field>
 
-        <FormControl isRequired mb={6} isInvalid={!!errors.email}>
-          <FormLabel fontSize="lg" htmlFor="input-email">
-            Email
-          </FormLabel>
-          <Input
-            name="email"
-            id="input-email"
-            size="lg"
-            type="email"
-            placeholder="Enter an email address"
-            value={userData.email}
-            onChange={handleInputChange}
-          />
-          {errors.email && <Text color="red.500">{errors.email}</Text>}
-        </FormControl>
+              <Field name="email">
+                {({ field }: FieldProps) => (
+                  <FormControl
+                    isRequired
+                    mb={6}
+                    isInvalid={!!(errors.email && touched.email)}
+                  >
+                    <FormLabel fontSize="lg" htmlFor="input-email">
+                      Email
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      id="input-email"
+                      type="email"
+                      placeholder="Enter an email address"
+                    />
+                    {errors.email && touched.email && (
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                )}
+              </Field>
 
-        <Button
-          type="submit"
-          colorScheme="green"
-          bg="green.400"
-          size="lg"
-          width="full"
-        >
-          Submit
-        </Button>
-      </Box>
+              <Field name="password">
+                {({ field }: FieldProps) => (
+                  <FormControl
+                    isRequired
+                    mb={6}
+                    isInvalid={!!(errors.password && touched.password)}
+                  >
+                    <FormLabel fontSize="lg" htmlFor="input-password">
+                      Password
+                    </FormLabel>
+                    <Input
+                      {...field}
+                      id="input-password"
+                      type="password"
+                      placeholder="Enter a password"
+                    />
+                    {errors.password && touched.password && (
+                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                    )}
+                  </FormControl>
+                )}
+              </Field>
+
+              <Button
+                type="submit"
+                colorScheme="green"
+                bg="green.400"
+                size="lg"
+                width="full"
+                isLoading={isSubmitting}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Form>
+        )}
+      </Formik>
     </Box>
   );
 };
