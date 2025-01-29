@@ -1,0 +1,69 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`NavBar renders properly 1`] = `
+<DocumentFragment>
+  <div
+    class="css-1ggpwrh"
+  >
+    <div
+      class="css-19pkskf"
+    >
+      <div
+        class="css-70qvj9"
+      >
+        <h1
+          class="chakra-heading navbar-item nav-title css-1x64xs0"
+        >
+          <a
+            class="chakra-link css-2s4j8o"
+            href="/"
+          >
+            Test Title
+          </a>
+        </h1>
+        <a
+          class="chakra-link css-fmj561"
+          href="/status"
+        >
+          User Status
+        </a>
+        <a
+          class="chakra-link css-1p1ylbe"
+          href="/about"
+        >
+          About
+        </a>
+      </div>
+      <div
+        class="css-17xejub"
+      />
+      <div
+        class="css-70qvj9"
+      >
+        <a
+          class="chakra-link css-fmj561"
+          href="/register"
+        >
+          Register
+        </a>
+        <a
+          class="chakra-link css-fmj561"
+          href="/login"
+        >
+          Log In
+        </a>
+        <a
+          class="chakra-link css-1p1ylbe"
+          href="/logout"
+        >
+          Log Out
+        </a>
+      </div>
+    </div>
+  </div>
+  <span
+    hidden=""
+    id="__chakra_env"
+  />
+</DocumentFragment>
+`;

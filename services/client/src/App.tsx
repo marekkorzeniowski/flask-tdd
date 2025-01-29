@@ -3,6 +3,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 import axios from "axios";
 import Users from "./components/Users";
 import AddUser from "./components/AddUser";
+import About from "./components/About";
+import { Route, Routes } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import LoginForm from './components/LoginForm';
+import RegisterForm from './components/RegisterForm';
 
 interface User {
   created_date: string;
@@ -36,12 +41,27 @@ const App = () => {
     setUsers((prevUsers) => [...prevUsers, newUser]);
   };
 
-  return (
-    <ChakraProvider>
-      <AddUser addUserToList={addUserToList} />
-      <Users users={users} />
-    </ChakraProvider>
-  );
+  const [title] = useState("DataBridge.io");
+
+return (
+  <ChakraProvider>
+    <NavBar title={title} />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <>
+            <AddUser addUserToList={addUserToList} />
+            <Users users={users} />
+          </>
+        }
+      />
+      <Route path="/about" element={<About />} />
+      <Route path="/register" element={<RegisterForm onSubmit={() => {}} />} />
+      <Route path="/login" element={<LoginForm onSubmit={() => {}} />} />
+    </Routes>
+  </ChakraProvider>
+);
 };
 
 export default App;
