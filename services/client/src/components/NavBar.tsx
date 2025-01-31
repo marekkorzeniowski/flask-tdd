@@ -14,9 +14,11 @@ import { Link as RouterLink } from "react-router-dom";
 
 interface NavBarProps {
   title: string;
+  logoutUser: () => void;
+  isAuthenticated: () => boolean;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ title }) => {
+const NavBar: React.FC<NavBarProps> = ({ title, logoutUser, isAuthenticated }) => {
   const { isOpen, onToggle } = useDisclosure();
 
   return (
@@ -36,7 +38,7 @@ const NavBar: React.FC<NavBarProps> = ({ title }) => {
         </Flex>
         <Spacer />
         <Flex alignItems="center" display={{ base: "none", md: "flex" }}>
-          <NavLinks />
+          <NavLinks logoutUser={logoutUser} isAuthenticated={isAuthenticated} />
         </Flex>
         <IconButton
           display={{ base: "flex", md: "none" }}
@@ -50,30 +52,35 @@ const NavBar: React.FC<NavBarProps> = ({ title }) => {
 
       <Collapse in={isOpen} animateOpacity>
         <Stack mt={2} display={{ md: "none" }} bg="gray.800" p={4} spacing={4}>
-          <NavLinks />
+          <NavLinks logoutUser={logoutUser} isAuthenticated={isAuthenticated} />
         </Stack>
       </Collapse>
     </Box>
   );
 };
 
-const NavLinks = () => (
+const NavLinks: React.FC<{ logoutUser: () => void; isAuthenticated: () => boolean }> = ({ logoutUser, isAuthenticated }) => (
   <>
-    <Link as={RouterLink} to="/status" mr={4} color="white">
-          User Status
-    </Link>
     <Link as={RouterLink} to="/about" mr={4} color="white">
       About
     </Link>
-    <Link as={RouterLink} to="/register" mr={4} color="white">
-      Register
+    <Link as={RouterLink} to="/status" mr={4} color="white">
+      User Status
     </Link>
-    <Link as={RouterLink} to="/login" mr={4} color="white">
-      Log In
-    </Link>
-    <Link as={RouterLink} to="/logout" color="white">
-      Log Out
-    </Link>
+    {!isAuthenticated() ? (
+      <>
+        <Link as={RouterLink} to="/register" mr={4} color="white">
+          Register
+        </Link>
+        <Link as={RouterLink} to="/login" mr={4} color="white">
+          Log In
+        </Link>
+      </>
+    ) : (
+      <Link as="span" onClick={logoutUser} mr={4} color="white" cursor="pointer">
+        Log Out
+      </Link>
+    )}
   </>
 );
 

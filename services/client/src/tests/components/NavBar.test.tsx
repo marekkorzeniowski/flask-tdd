@@ -4,9 +4,15 @@ import "@testing-library/jest-dom/vitest";
 
 import NavBar from "../../components/NavBar";
 
+const mockProps = {
+  title: "Hello, World!",
+  logoutUser: () => {},
+  isAuthenticated: () => false,
+};
+
 it("NavBar renders without crashing", () => {
   render(
-      <NavBar title="Hello, World!" />
+      <NavBar {...mockProps} />
   );
 
   const titleElement = screen.getByText("Hello, World!");
@@ -15,24 +21,9 @@ it("NavBar renders without crashing", () => {
   expect(titleElement.closest("h1")).toHaveClass("nav-title");
 });
 
-//   const links = [
-// //     { text: "User Status", href: "/status" },
-//     { text: "About", href: "/about" },
-//     { text: "Register", href: "/register" },
-//     { text: "Log In", href: "/login" },
-//     { text: "Log Out", href: "/logout" },
-//   ];
-//
-//   links.forEach((link) => {
-//     const linkElements = screen.getAllByRole("link", { name: link.text });
-//     expect(linkElements.length).toBeGreaterThan(0);
-//     expect(linkElements[0]).toHaveAttribute("href", link.href);
-//   });
-
-
 // it("NavBar renders properly", () => {
 //   const { asFragment } = render(
-//     <NavBar title="Test Title" />
+//       <NavBar {...mockProps} />
 //   );
 //   expect(asFragment()).toMatchSnapshot();
 // });
