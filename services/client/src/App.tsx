@@ -8,6 +8,7 @@ import { Route, Routes } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import UserStatus from './components/UserStatus';
 
 interface User {
   created_date: string;
@@ -136,6 +137,15 @@ return (
 <Route
   path="/login"
   element={<LoginForm onSubmit={handleLoginFormSubmit} isAuthenticated={isAuthenticated} />}
+/>
+<Route
+  path="/status"
+  element={
+    <UserStatus
+      accessToken={accessToken || ''}
+      isAuthenticated={isAuthenticated}
+    />
+  }
 />
     </Routes>
   </ChakraProvider>
