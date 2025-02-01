@@ -1,7 +1,6 @@
 import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { z } from 'zod';
-import { Navigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -12,6 +11,12 @@ import {
   VStack,
   Heading,
 } from '@chakra-ui/react';
+import { Navigate } from 'react-router-dom';
+
+interface RegisterFormProps {
+  onSubmit: (values: { username: string; email: string; password: string }) => Promise<void>;
+  isAuthenticated: () => boolean;
+}
 
 const validationSchema = z.object({
   username: z.string()
@@ -24,18 +29,14 @@ const validationSchema = z.object({
     .min(11, 'Password must be at least 11 characters long'),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type FormValues = z.infer<typeof validationSchema>;
-
-
-interface RegisterFormProps {
-  onSubmit: (values: { username: string; email: string; password: string }) => Promise<void>;
-  isAuthenticated: () => boolean;
-}
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isAuthenticated }) => {
   if (isAuthenticated()) {
     return <Navigate to="/" replace />;
   }
+
   return (
     <Box maxWidth="400px" marginTop={10} margin="100px auto 0">
       <Heading as="h1" size="xl" textAlign="center" mb={6}>
@@ -47,10 +48,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isAuthenticated }
           email: '',
           password: '',
         }}
-        onSubmit={(values, { setSubmitting, resetForm }) => {
-          onSubmit(values);
-          resetForm();
-          setSubmitting(false);
+        onSubmit={async (values, { setSubmitting, resetForm }) => {
+          try {
+            await onSubmit(values);
+            resetForm();
+          } catch (error) {
+            console.error('Registration failed:', error);
+          } finally {
+            setSubmitting(false);
+          }
         }}
         validate={(values) => {
           try {
@@ -69,7 +75,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isAuthenticated }
                   <FormControl isInvalid={!!(errors.username && touched.username)}>
                     <FormLabel htmlFor="username">Username</FormLabel>
                     <Input {...field} id="username" placeholder="Enter a username" />
-                    <FormErrorMessage>{errors.username}</FormErrorMessage>
+                    <FormErrorMessage data-testid="errors-username">{errors.username}</FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
@@ -78,7 +84,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isAuthenticated }
                   <FormControl isInvalid={!!(errors.email && touched.email)}>
                     <FormLabel htmlFor="email">Email</FormLabel>
                     <Input {...field} id="email" type="email" placeholder="Enter an email address" />
-                    <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    <FormErrorMessage data-testid="errors-email">{errors.email}</FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
@@ -87,7 +93,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, isAuthenticated }
                   <FormControl isInvalid={!!(errors.password && touched.password)}>
                     <FormLabel htmlFor="password">Password</FormLabel>
                     <Input {...field} id="password" type="password" placeholder="Enter a password" />
-                    <FormErrorMessage>{errors.password}</FormErrorMessage>
+                    <FormErrorMessage data-testid="errors-password">{errors.password}</FormErrorMessage>
                   </FormControl>
                 )}
               </Field>
