@@ -9,6 +9,7 @@ import NavBar from './components/NavBar';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import UserStatus from './components/UserStatus';
+import Message from './components/Message'
 
 interface User {
   created_date: string;
@@ -19,7 +20,10 @@ interface User {
 
 const App = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [title] = useState("DataBridge.io");
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [messageType, setMessageType] = useState<'info' | 'warning' | 'success' | 'error' | null>(null);  // new
+  const [messageText, setMessageText] = useState<string | null>(null);
   const isAuthenticated = () => {
   return !!accessToken;
 };
@@ -38,13 +42,15 @@ const App = () => {
   };
 
 
-  const handleRegisterFormSubmit = async (data: { username: string; email: string; password: string }) => {
+const handleRegisterFormSubmit = async (data: { username: string; email: string; password: string }) => {
   try {
     const url = `${import.meta.env.VITE_API_SERVICE_URL}/auth/register`;
     const response = await axios.post(url, data);
     console.log(response.data);
+    createMessage('success', 'Registration successful! You can now log in.'); // Display success message
   } catch (err) {
     console.log(err);
+    createMessage('error', 'Registration failed. The user might already exist.'); // Display error message
   }
 };
 const validRefresh = async () => {
@@ -91,34 +97,61 @@ useEffect(() => {
   checkAuth();
 }, []);
 
-  const handleLoginFormSubmit = async (data: { email: string; password: string }) => {
+const handleLoginFormSubmit = async (data: { email: string; password: string }) => {
   try {
     const url = `${import.meta.env.VITE_API_SERVICE_URL}/auth/login`;
     const response = await axios.post(url, data);
     console.log(response.data);
     setAccessToken(response.data.access_token);
-    window.localStorage.setItem('refreshToken', response.data.refresh_token);  // new
-    await fetchUsers(); // Fetch users after successful login
+    window.localStorage.setItem('refreshToken', response.data.refresh_token);
+    await fetchUsers();
+    createMessage('success', 'Login successful!'); // Display success message
   } catch (err) {
     console.log(err);
+    createMessage('error', 'Login failed. Please check your credentials.'); // Display error message
   }
 };
 
   // Function to add new user to the users state
-  const addUserToList = (newUser: User) => {
-    setUsers((prevUsers) => [...prevUsers, newUser]);
-  };
-
-  const [title] = useState("DataBridge.io");
-
-  const logoutUser = () => {
-  setAccessToken(null);
-  window.localStorage.removeItem('refreshToken');
+const addUserToList = (newUser: User) => {
+  setUsers((prevUsers) => [...prevUsers, newUser]);
+  createMessage('success', 'User added successfully.'); // Display success message
 };
 
-return (
-  <ChakraProvider>
-    <NavBar title={title} logoutUser={logoutUser} isAuthenticated={isAuthenticated} />
+const logoutUser = () => {
+  setAccessToken(null);
+  window.localStorage.removeItem('refreshToken');
+  createMessage('info', 'You have been logged out.'); // Display success message
+};
+
+  const clearMessage = () => {
+    setMessageType(null);
+    setMessageText(null);
+  };
+
+  const createMessage = (type: 'info' | 'success' | 'error', text: string) => {
+    setMessageType(type);
+    setMessageText(text);
+  setTimeout(() => {
+    clearMessage();
+  }, 3000);
+  };
+
+  // Add a test message when the component mounts
+  useEffect(() => {
+    createMessage('info', 'Welcome to the application!');
+  }, []);
+
+  return (
+    <ChakraProvider>
+      <NavBar title={title} logoutUser={logoutUser} isAuthenticated={isAuthenticated} />
+      {messageType && messageText && (
+        <Message
+          messageType={messageType}
+          messageText={messageText}
+          onClose={clearMessage}  // Make sure this is passed
+        />
+      )}
     <Routes>
       <Route
         path="/"
