@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, useDisclosure } from "@chakra-ui/react";
 import axios from "axios";
 import Users from "./components/Users";
 import AddUser from "./components/AddUser";
@@ -9,7 +9,8 @@ import NavBar from './components/NavBar';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import UserStatus from './components/UserStatus';
-import Message from './components/Message'
+import Message from './components/Message';
+import AddUserModal from './components/AddUserModal';
 
 interface User {
   created_date: string;
@@ -24,6 +25,7 @@ const App = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'info' | 'warning' | 'success' | 'error' | null>(null);  // new
   const [messageText, setMessageText] = useState<string | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const isAuthenticated = () => {
   return !!accessToken;
 };
@@ -142,6 +144,37 @@ const logoutUser = () => {
     createMessage('info', 'Welcome to the application!');
   }, []);
 
+    const addUser = async (userData: { username: string; email: string; password: string }) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_SERVICE_URL}/users`, {
+        username: userData.username,
+        email: userData.email,
+        password: userData.password,
+        created_date: new Date().toISOString()
+      });
+
+      // Update the users state with the new user
+      setUsers(prevUsers => [...prevUsers, response.data]);
+      createMessage('success', 'User added successfully.');
+      onClose(); // Close the modal
+      await fetchUsers(); // Fetch the updated list of users
+    } catch (err) {
+      console.error(err);
+      createMessage('error', 'Failed to add user. The user might already exist.');
+    }
+  };
+
+  const removeUser = async (userId: number) => {
+  try {
+    await axios.delete(`${import.meta.env.VITE_API_SERVICE_URL}/users/${userId}`);
+    await fetchUsers(); // Fetch the updated list of users
+    createMessage('success', 'User removed successfully.');
+  } catch (err) {
+    console.error(err);
+    createMessage('error', 'Failed to remove user. Please try again.');
+  }
+};
+
   return (
     <ChakraProvider>
       <NavBar title={title} logoutUser={logoutUser} isAuthenticated={isAuthenticated} />
@@ -153,15 +186,18 @@ const logoutUser = () => {
         />
       )}
     <Routes>
-      <Route
-        path="/"
-        element={
-          <>
-            <AddUser addUserToList={addUserToList} />
-            <Users users={users} />
-          </>
-        }
-      />
+        <Route
+          path="/"
+          element={
+            <>
+              <Users users={users}
+                     onAddUser={onOpen}
+                     removeUser={removeUser}/>
+                     isAuthenticated={isAuthenticated()}
+              <AddUserModal isOpen={isOpen} onClose={onClose} addUser={addUser} />
+            </>
+          }
+        />
       <Route path="/about" element={<About />} />
 <Route
   path="/register"

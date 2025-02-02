@@ -9,6 +9,7 @@ import {
   Th,
   Td,
   Text,
+  Button,
 } from "@chakra-ui/react";
 
 interface User {
@@ -20,38 +21,53 @@ interface User {
 
 interface UsersProps {
   users: User[];
+  onAddUser: () => void;
+  removeUser: (userId: number) => void;
+  isAuthenticated: boolean;
 }
 
-const Users: React.FC<UsersProps> = ({ users }) => {
+const Users: React.FC<UsersProps> = ({ users, onAddUser, removeUser, isAuthenticated }) => {
   return (
     <Box p={4} maxW="1200px" mx="auto">
-      <Heading
-        as="h1"
-        size="2xl"
-        mb={6}
-        mt={12}
-        textAlign="left"
-        color="gray.700"
-      >
+      <Heading as="h1" size="xl" mb={6} mt={12} textAlign="left" color="gray.700">
         Users
       </Heading>
+      {isAuthenticated && (
+        <Button colorScheme="blue" onClick={onAddUser} mb={4}>
+          Add User
+        </Button>
+      )}
       <Divider borderColor="gray.400" />
 
       {users.length > 0 ? (
         <Table variant="simple" mt={4}>
           <Thead>
             <Tr>
+              <Th>ID</Th>
               <Th>Username</Th>
               <Th>Email</Th>
               <Th>Created Date</Th>
+              {isAuthenticated && <Th>Actions</Th>}
             </Tr>
           </Thead>
           <Tbody>
             {users.map((user) => (
-              <Tr key={user.username}>
+              <Tr key={user.id}>
+                <Td>{user.id}</Td>
                 <Td>{user.username}</Td>
                 <Td>{user.email}</Td>
-                <Td>{user.created_date}</Td>
+                <Td>{new Date(user.created_date).toLocaleString()}</Td>
+                {isAuthenticated && (
+                  <Td>
+                    <Button
+                      colorScheme="red"
+                      size="sm"
+                      onClick={() => removeUser(user.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Td>
+                )}
               </Tr>
             ))}
           </Tbody>
