@@ -1,3 +1,15 @@
+# Build images with docker compose
+docker compose build
+docker compose up
+
+# Create db
+docker compose exec api python manage.py recreate_db
+
+# Seed db
+docker compose exec api python manage.py seed_db
+
+
+################################## AWS ##################################
 # Create ECR repo
 aws ecr create-repository --repository-name test-driven-client --region eu-north-1
 
