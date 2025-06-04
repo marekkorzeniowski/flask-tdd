@@ -12,6 +12,7 @@ locals {
     docker_image_url_users = var.docker_image_url_users
     region                 = var.region
     secret_key            = var.secret_key
+    database_url          = "postgres://webapp:${var.rds_password}@${aws_db_instance.production.endpoint}/api_prod"
   })
 }
 
@@ -35,6 +36,7 @@ resource "aws_ecs_task_definition" "users-app" {
   memory                   = "512"
   cpu                      = "256"
   container_definitions    = local.users_app_json
+  depends_on               = [aws_db_instance.production]
 }
 
 resource "aws_ecs_service" "client-fargate" {

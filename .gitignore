@@ -173,3 +173,5 @@ cython_debug/
 .pypirc
 
 .terraform
+terraform.tfstate
+terraform.tfstate.backup

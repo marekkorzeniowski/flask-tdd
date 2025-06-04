@@ -96,15 +96,17 @@ docker exec -it e55cfc18f1c1 bash
 
 ### Fargate/Terraform part
 docker build \
+  --platform linux/amd64 \
   -f services/users/Dockerfile.prod \
   -t $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod \
   ./services/users
 
 docker build \
+  --platform linux/amd64 \
   -f services/client/Dockerfile.prod \
   -t $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-client-fargate:prod \
   --build-arg NODE_ENV=production \
-  --build-arg VITE_API_SERVICE_URL=http://notreal \
+  --build-arg VITE_API_SERVICE_URL=http://flask-react-fargate-alb-1722024578.eu-north-1.elb.amazonaws.com \
   ./services/client
 
 aws ecr get-login-password --region eu-north-1 \
@@ -115,4 +117,14 @@ docker push $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-dr
 
 
 
+### dockex rebuild
+#docker buildx build \
+#  --platform linux/amd64 \
+#  -t 992487938048.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod \
+#  --push .
 
+aws ecr get-login-password --region eu-north-1 \
+  | docker login --username AWS --password-stdin $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com
+
+docker manifest inspect 992487938048.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod
+docker manifest inspect 992487938048.dkr.ecr.eu-north-1.amazonaws.com/test-driven-client-fargate:prod

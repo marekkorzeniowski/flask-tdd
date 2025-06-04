@@ -76,3 +76,21 @@ variable "ssh_pubkey_file" {
   description = "Path to an SSH public key"
   default     = "~/.ssh/id_ed25519.pub"
 }
+
+# rds
+
+variable "rds_db_name" {
+  description = "RDS database name"
+  default     = "api_prod"
+}
+variable "rds_username" {
+  description = "RDS database username"
+  default     = "webapp"
+}
+variable "rds_password" {
+  description = "RDS database password"
+}
+variable "rds_instance_class" {
+  description = "RDS instance type"
+  default     = "db.t4g.micro"
+}
