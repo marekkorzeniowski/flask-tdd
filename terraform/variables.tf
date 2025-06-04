@@ -61,7 +61,7 @@ variable "app_count" {
 }
 variable "secret_key" {
   description = "Flask Secret Key"
-  default     = "foobar"
+  default     = "956b310e7bb5c301c8ddc37960a4604d44b47a687877f2e5"
 }
 
 # logs
