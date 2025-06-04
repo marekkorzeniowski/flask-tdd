@@ -1,3 +1,9 @@
+### To decommission after testing
+#1 RDS
+#2 CODE BUILD
+#3 ECR - CONTAINER REGISTRY
+#4 ECS - container service
+
 # Build images with docker compose
 docker compose build
 docker compose up
@@ -57,3 +63,20 @@ docker-compose exec -T api isort src --check-only
 docker-compose exec -T client npm run lint
 docker-compose exec -T client npm run prettier:check
 docker-compose exec -T client npm run prettier:write
+
+
+# Check DB status
+aws --region eu-north-1 rds describe-db-instances \
+  --db-instance-identifier flask-react-db \
+  --query 'DBInstances[].{DBInstanceStatus:DBInstanceStatus}'
+
+# Get db endpoint
+aws --region eu-north-1 rds describe-db-instances \
+  --db-instance-identifier flask-react-db \
+  --query 'DBInstances[].{Address:Endpoint.Address}'
+
+# DB URI example
+postgres://webapp:<YOUR_RDS_PASSWORD>@<YOUR_RDS_ADDRESS>:5432/api_prod
+
+
+
