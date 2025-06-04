@@ -3,6 +3,8 @@
 #2 CODE BUILD
 #3 ECR - CONTAINER REGISTRY
 #4 ECS - container service
+#5 Cloud Watch
+
 
 # Build images with docker compose
 docker compose build
@@ -77,6 +79,15 @@ aws --region eu-north-1 rds describe-db-instances \
 
 # DB URI example
 postgres://webapp:<YOUR_RDS_PASSWORD>@<YOUR_RDS_ADDRESS>:5432/api_prod
+
+# ssh into EC2 instance
+ssh -i ~/.ssh/ecs.pem ec2-user@<EC2_PUBLIC_IP>
+
+# find container id
+docker ps
+
+# Enter the container
+docker exec -it e55cfc18f1c1 bash
 
 
 
