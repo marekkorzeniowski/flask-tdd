@@ -18,7 +18,6 @@ register_definition() {
   fi
 }
 
-# new
 update_service() {
   if [[ $(aws ecs update-service --cluster $cluster --service $service --task-definition $revision | $JQ '.service.taskDefinition') != $revision ]]; then
     echo "Error updating service."
@@ -28,27 +27,39 @@ update_service() {
 
 deploy_cluster() {
 
-  cluster="flask-react-cluster" # new
+  cluster="flask-react-cluster"
 
   # users
-  service="flask-react-users-service"  # new
+  service="flask-react-users-service"
   template="ecs_users_taskdefinition.json"
   task_template=$(cat "ecs/$template")
   task_def=$(printf "$task_template" $AWS_ACCOUNT_ID $AWS_RDS_URI $PRODUCTION_SECRET_KEY)
   echo "$task_def"
   register_definition
-  update_service  # new
+  update_service
 
   # client
-  service="flask-react-client-service"  # new
+  service="flask-react-client-service"
   template="ecs_client_taskdefinition.json"
   task_template=$(cat "ecs/$template")
   task_def=$(printf "$task_template" $AWS_ACCOUNT_ID)
   echo "$task_def"
   register_definition
-  update_service  # new
+  update_service
 
 }
 
+# new
+echo $CODEBUILD_WEBHOOK_BASE_REF
+echo $CODEBUILD_WEBHOOK_HEAD_REF
+echo $CODEBUILD_WEBHOOK_TRIGGER
+echo $CODEBUILD_WEBHOOK_EVENT
+
+# new
+if  [ "$CODEBUILD_WEBHOOK_TRIGGER" == "branch/master" ] && \
+    [ "$CODEBUILD_WEBHOOK_HEAD_REF" == "refs/heads/master" ]
+then
+  echo "Updating ECS."
 configure_aws_cli
 deploy_cluster
+fi
