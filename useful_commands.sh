@@ -90,4 +90,25 @@ docker ps
 docker exec -it e55cfc18f1c1 bash
 
 
+### Fargate/Terraform part
+docker build \
+  -f services/users/Dockerfile.prod \
+  -t $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod \
+  ./services/users
+
+docker build \
+  -f services/client/Dockerfile.prod \
+  -t $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-client-fargate:prod \
+  --build-arg NODE_ENV=production \
+  --build-arg VITE_API_SERVICE_URL=http://notreal \
+  ./services/client
+
+aws ecr get-login-password --region eu-north-1 \
+  | docker login --username AWS --password-stdin $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com
+
+docker push $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod
+docker push $FLASK_REACT_AWS_ACCOUNT_ID.dkr.ecr.eu-north-1.amazonaws.com/test-driven-client-fargate:prod
+
+
+
 
