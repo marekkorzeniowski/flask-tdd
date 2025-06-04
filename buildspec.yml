@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     AWS_REGION: "eu-north-1"
-    VITE_API_SERVICE_URL: "http://localhost:5004"
+    VITE_API_SERVICE_URL: "http://flask-react-alb-2023204024.eu-north-1.elb.amazonaws.com"
 
 phases:
   pre_build:
