@@ -1,9 +1,13 @@
 ### To decommission after testing
-#1 RDS
-#2 CODE BUILD
-#3 ECR - CONTAINER REGISTRY
-#4 ECS - container service
-#5 Cloud Watch
+#1 CODE BUILD
+#2 ECR - CONTAINER REGISTRY
+#3 ALB - load balancer - deleted
+  #* listeners - deleted
+  #* target groups - deleted
+#4 RDS - deleted
+#5 ECS - container service - deleted
+#6 Cloud Watch - deleted
+   #* log groups deleted
 
 
 # Build images with docker compose
