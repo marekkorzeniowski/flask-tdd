@@ -47,6 +47,22 @@ variable "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   default     = "flask-react-fargate"
 }
+variable "docker_image_url_client" {
+  description = "Docker client image to run in the ECS cluster"
+  default     = "992487938048.dkr.ecr.eu-north-1.amazonaws.com/test-driven-client-fargate:prod"
+}
+variable "docker_image_url_users" {
+  description = "Docker users image to run in the ECS cluster"
+  default     = "992487938048.dkr.ecr.eu-north-1.amazonaws.com/test-driven-users-fargate:prod"
+}
+variable "app_count" {
+  description = "Number of Docker containers to run"
+  default     = 1
+}
+variable "secret_key" {
+  description = "Flask Secret Key"
+  default     = "foobar"
+}
 
 # logs
 
